@@ -231,3 +231,29 @@ img { max-width: 100%; display: block; }
   .values-grid { grid-template-columns: 1fr 1fr; }
   .download-btns { flex-direction: column; align-items: center; }
 }
+
+/* POLICES FREDOKA ET NUNITO */
+h1, h2, h3, h4 { font-family: 'Fredoka', 'Outfit', sans-serif; }
+.hero-title, .event-content h2, .download-content h2 { font-family: 'Fredoka', 'Outfit', sans-serif; }
+.hero-sub, .hero-note, .section-header h2, .hero-badge, p { font-family: 'Nunito', 'Outfit', sans-serif; }
+
+/* HERO FOND BLANC AVEC TRAITS DIGITAUX */
+.hero { background: #FAFAFA; min-height: auto; padding: 100px 0 60px; }
+.hero-bg-white { position: absolute; inset: 0; background: #FAFAFA; }
+.digital-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-banner-wrap { width: 100%; margin-top: 20px; position: relative; z-index: 2; }
+.hero-banner-img { width: 100%; max-width: 100%; display: block; border-radius: 0; }
+.hero-content { position: relative; z-index: 3; }
+.hero-title { color: var(--anthracite); letter-spacing: -1px; }
+.hero-title em { color: var(--orange); }
+.hero-sub { color: #555; }
+.hero-note { color: #888; }
+.hero-badge-dark { background: rgba(30,120,220,0.1); color: var(--blue); border-color: rgba(30,120,220,0.2); }
+.hero-cta-wrap .btn-outline-white { color: var(--blue); border-color: var(--blue); }
+.hero-cta-wrap .btn-outline-white:hover { background: var(--blue); color: var(--white); }
+.hero-scroll-indicator { background: rgba(10,10,10,0.1); }
+.scroll-dot { background: var(--blue); }
+
+/* FONDATEURS — VISAGES BIEN CADRÉS */
+.team-img-wrap { height: 320px; overflow: hidden; }
+.team-img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; }
