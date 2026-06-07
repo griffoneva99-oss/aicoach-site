@@ -294,3 +294,15 @@ h1, h2, h3, h4 { font-family: 'Fredoka', 'Outfit', sans-serif; }
 .digital-canvas {
   opacity: 0.4;
 }
+
+/* CANVAS FIXE EN FOND DU SITE ENTIER */
+#siteCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+body { background: transparent !important; }
+.header, nav, section, footer, .stats, .app-section, .pricing, .team, .testimonials, .contact-section { background: transparent !important; position: relative; z-index: 1; }
+.stats { background: rgba(20,80,180,0.88) !important; }
+.app-card, .pricing-card, .testi-card, .team-card { background: rgba(250,252,255,0.92) !important; backdrop-filter: blur(8px); border: 1px solid rgba(30,120,255,0.1); }
+.pricing-featured { background: linear-gradient(135deg, rgba(21,96,184,0.95), rgba(30,120,220,0.95)) !important; }
+.footer { background: rgba(10,10,10,0.95) !important; position: relative; z-index: 1; }
+.hero-bg-white { display: none; }
+.hero { background: transparent !important; }
+.contact-form input, .contact-form textarea { background: rgba(250,252,255,0.9) !important; }
