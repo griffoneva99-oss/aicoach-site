@@ -1,15 +1,91 @@
-// PARTICLES HERO
+// LISÉRÉS BLEUS LUMINEUX ONDULANTS
+function initDigitalCanvas() {
+  const canvas = document.getElementById('digitalCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = canvas.parentElement.offsetHeight || 600;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); });
+
+  const W = () => canvas.width;
+  const H = () => canvas.height;
+
+  // Création des lisérés ondulants
+  const streams = [
+    { yBase: 0.35, amp: 0.12, freq: 0.8, speed: 0.004, phase: 0, width: 3, alpha: 0.7, color: '30,140,255' },
+    { yBase: 0.45, amp: 0.08, freq: 1.1, speed: 0.003, phase: 1.2, width: 2, alpha: 0.5, color: '60,160,255' },
+    { yBase: 0.55, amp: 0.14, freq: 0.7, speed: 0.005, phase: 2.5, width: 2.5, alpha: 0.6, color: '20,120,240' },
+    { yBase: 0.65, amp: 0.06, freq: 1.4, speed: 0.0035, phase: 0.8, width: 1.5, alpha: 0.4, color: '80,180,255' },
+  ];
+
+  let t = 0;
+
+  function drawStream(s) {
+    const h = H(), w = W();
+    const steps = Math.ceil(w / 3);
+
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const x = (i / steps) * w;
+      const wave1 = Math.sin(x * 0.006 * s.freq + t * s.speed * 300 + s.phase) * s.amp * h;
+      const wave2 = Math.sin(x * 0.003 * s.freq + t * s.speed * 200 + s.phase + 1) * s.amp * 0.4 * h;
+      const y = s.yBase * h + wave1 + wave2;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+
+    // Glow effect — plusieurs passes
+    for (let pass = 0; pass < 4; pass++) {
+      const blurW = s.width * (1 + pass * 2.5);
+      const a = s.alpha * (1 - pass * 0.22);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = `rgba(${s.color},${a * (pass === 0 ? 1 : 0.4)})`;
+      ctx.lineWidth = pass === 0 ? s.width : blurW;
+      ctx.stroke();
+    }
+
+    // Ligne centrale brillante
+    ctx.strokeStyle = `rgba(180,220,255,${s.alpha * 0.6})`;
+    ctx.lineWidth = s.width * 0.4;
+    ctx.stroke();
+
+    // Points lumineux le long du tracé
+    const dotCount = Math.floor(w / 120);
+    for (let d = 0; d < dotCount; d++) {
+      const prog = (d / dotCount + t * 0.0003 * s.speed * 80) % 1;
+      const x = prog * w;
+      const wave1 = Math.sin(x * 0.006 * s.freq + t * s.speed * 300 + s.phase) * s.amp * h;
+      const wave2 = Math.sin(x * 0.003 * s.freq + t * s.speed * 200 + s.phase + 1) * s.amp * 0.4 * h;
+      const y = s.yBase * h + wave1 + wave2;
+      const pAlpha = 0.4 + 0.6 * Math.sin(t * 0.05 + d * 1.3);
+      ctx.beginPath();
+      ctx.arc(x, y, s.width * 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,230,255,${pAlpha * s.alpha})`;
+      ctx.fill();
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, W(), H());
+    streams.forEach(drawStream);
+    t++;
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+initDigitalCanvas();
+
+// PARTICLES LÉGÈRES
 function createParticles() {
   const container = document.getElementById('particles');
   if (!container) return;
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 15; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.animationDuration = (6 + Math.random() * 8) + 's';
-    p.style.animationDelay = (Math.random() * 8) + 's';
-    p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-    p.style.opacity = (0.3 + Math.random() * 0.5).toString();
+    p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;opacity:${0.2+Math.random()*0.3};`;
     container.appendChild(p);
   }
 }
@@ -28,22 +104,19 @@ window.addEventListener('load', () => {
   });
 });
 
-// PARALLAX BG SECTIONS
-const parallaxSections = [
-  { section: '.event', img: '.event-bg img' },
-  { section: '.download', img: '.download-bg img' }
-];
+// PARALLAX
 window.addEventListener('scroll', () => {
-  parallaxSections.forEach(({ section, img }) => {
-    const el = document.querySelector(section);
-    const im = document.querySelector(img);
-    if (!el || !im) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      const p = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
-      im.style.transform = `translateY(${(p - 0.5) * 60}px) scale(1.1)`;
-    }
-  });
+  [{ section: '.event', img: '.event-bg img' }, { section: '.download', img: '.download-bg img' }]
+    .forEach(({ section, img }) => {
+      const el = document.querySelector(section);
+      const im = document.querySelector(img);
+      if (!el || !im) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        const p = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+        im.style.transform = `translateY(${(p - 0.5) * 60}px) scale(1.1)`;
+      }
+    });
 }, { passive: true });
 
 // CARD 3D HOVER
@@ -55,117 +128,4 @@ document.querySelectorAll('.app-card, .pricing-card, .testi-card, .team-card').f
     card.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg) translateY(-6px)`;
   });
   card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-});
-
-// STATS GLOW ANIMATION
-document.querySelectorAll('.stat-item').forEach((item, i) => {
-  item.style.animationDelay = (i * 0.1) + 's';
-});
-
-// ORANGE CURSOR TRAIL ON HERO
-const hero = document.querySelector('.hero');
-if (hero && window.innerWidth > 900) {
-  hero.addEventListener('mousemove', e => {
-    const dot = document.createElement('div');
-    dot.style.cssText = `position:fixed;width:5px;height:5px;background:#FF781E;border-radius:50%;pointer-events:none;z-index:9999;left:${e.clientX-2.5}px;top:${e.clientY-2.5}px;opacity:.7;transition:opacity .8s,transform .8s;`;
-    document.body.appendChild(dot);
-    setTimeout(() => { dot.style.opacity='0'; dot.style.transform='scale(0)'; }, 50);
-    setTimeout(() => dot.remove(), 850);
-  });
-}
-
-// TRAITS DIGITAUX BLEUS SUR FOND BLANC
-function initDigitalCanvas() {
-  const canvas = document.getElementById('digitalCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  
-  function resize() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const lines = Array.from({length: 8}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 1.2,
-    vy: (Math.random() - 0.5) * 0.8,
-    len: 80 + Math.random() * 120,
-    alpha: 0.15 + Math.random() * 0.25,
-    width: 1 + Math.random() * 1.5,
-    history: [],
-  }));
-
-  const dots = Array.from({length: 30}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: 1 + Math.random() * 2,
-    alpha: 0.1 + Math.random() * 0.3,
-    pulse: Math.random() * Math.PI * 2,
-  }));
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Traits ondulés
-    lines.forEach(line => {
-      line.history.push({x: line.x, y: line.y});
-      if (line.history.length > line.len) line.history.shift();
-      line.x += line.vx;
-      line.y += line.vy;
-      if (line.x < 0 || line.x > canvas.width) line.vx *= -1;
-      if (line.y < 0 || line.y > canvas.height) line.vy *= -1;
-
-      if (line.history.length > 2) {
-        ctx.beginPath();
-        ctx.moveTo(line.history[0].x, line.history[0].y);
-        for (let i = 1; i < line.history.length; i++) {
-          ctx.lineTo(line.history[i].x, line.history[i].y);
-        }
-        const grad = ctx.createLinearGradient(
-          line.history[0].x, line.history[0].y,
-          line.history[line.history.length-1].x, line.history[line.history.length-1].y
-        );
-        grad.addColorStop(0, `rgba(30,120,220,0)`);
-        grad.addColorStop(0.5, `rgba(30,120,220,${line.alpha})`);
-        grad.addColorStop(1, `rgba(30,120,220,0)`);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = line.width;
-        ctx.stroke();
-      }
-    });
-
-    // Points brillants
-    dots.forEach(dot => {
-      dot.pulse += 0.03;
-      const a = dot.alpha * (0.6 + 0.4 * Math.sin(dot.pulse));
-      ctx.beginPath();
-      ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(30,120,220,${a})`;
-      ctx.fill();
-    });
-
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-initDigitalCanvas();
-
-// FIX IMAGES MANQUANTES — retry avec fallback
-document.querySelectorAll('.app-card-img').forEach(img => {
-  img.addEventListener('error', () => {
-    if (!img.dataset.retried) {
-      img.dataset.retried = '1';
-      const urls = [
-        'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80',
-        'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=80',
-        'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80',
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80',
-      ];
-      const idx = Array.from(document.querySelectorAll('.app-card-img')).indexOf(img);
-      img.src = urls[idx % urls.length];
-    }
-  });
 });
