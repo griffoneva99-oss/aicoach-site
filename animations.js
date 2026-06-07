@@ -73,3 +73,99 @@ if (hero && window.innerWidth > 900) {
     setTimeout(() => dot.remove(), 850);
   });
 }
+
+// TRAITS DIGITAUX BLEUS SUR FOND BLANC
+function initDigitalCanvas() {
+  const canvas = document.getElementById('digitalCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const lines = Array.from({length: 8}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: (Math.random() - 0.5) * 0.8,
+    len: 80 + Math.random() * 120,
+    alpha: 0.15 + Math.random() * 0.25,
+    width: 1 + Math.random() * 1.5,
+    history: [],
+  }));
+
+  const dots = Array.from({length: 30}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: 1 + Math.random() * 2,
+    alpha: 0.1 + Math.random() * 0.3,
+    pulse: Math.random() * Math.PI * 2,
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Traits ondulés
+    lines.forEach(line => {
+      line.history.push({x: line.x, y: line.y});
+      if (line.history.length > line.len) line.history.shift();
+      line.x += line.vx;
+      line.y += line.vy;
+      if (line.x < 0 || line.x > canvas.width) line.vx *= -1;
+      if (line.y < 0 || line.y > canvas.height) line.vy *= -1;
+
+      if (line.history.length > 2) {
+        ctx.beginPath();
+        ctx.moveTo(line.history[0].x, line.history[0].y);
+        for (let i = 1; i < line.history.length; i++) {
+          ctx.lineTo(line.history[i].x, line.history[i].y);
+        }
+        const grad = ctx.createLinearGradient(
+          line.history[0].x, line.history[0].y,
+          line.history[line.history.length-1].x, line.history[line.history.length-1].y
+        );
+        grad.addColorStop(0, `rgba(30,120,220,0)`);
+        grad.addColorStop(0.5, `rgba(30,120,220,${line.alpha})`);
+        grad.addColorStop(1, `rgba(30,120,220,0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = line.width;
+        ctx.stroke();
+      }
+    });
+
+    // Points brillants
+    dots.forEach(dot => {
+      dot.pulse += 0.03;
+      const a = dot.alpha * (0.6 + 0.4 * Math.sin(dot.pulse));
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(30,120,220,${a})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+initDigitalCanvas();
+
+// FIX IMAGES MANQUANTES — retry avec fallback
+document.querySelectorAll('.app-card-img').forEach(img => {
+  img.addEventListener('error', () => {
+    if (!img.dataset.retried) {
+      img.dataset.retried = '1';
+      const urls = [
+        'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80',
+        'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=80',
+        'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80',
+        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80',
+      ];
+      const idx = Array.from(document.querySelectorAll('.app-card-img')).indexOf(img);
+      img.src = urls[idx % urls.length];
+    }
+  });
+});
